@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biblioteca CRUD</title>
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+<h1>Biblioteca</h1>
+    
+
+
+
+
+<div id="formulario">
+<h2>Cadastrar livro</h2>
+        <form id="formulario-livro">
+ <input type="hidden" id="livro-id">
+<label for="titulo">Título:</label>
+ <input type="text" id="titulo" required><br>
+ <label for="autor">Autor:</label>
+  <input type="text" id="autor" required><br>
+<label for="aluno">Aluno:</label>
+   <input type="text" id="aluno" required><br>
+     <label for="curso">Curso:</label>
+       <input type="text" id="curso" required><br>
+   <label for="matricula">Matrícula:</label>
+ <input type="text" id="matricula" required pattern="[0-9]+" title="A matrícula deve conter apenas números"><br>
+ <button type="submit">Salvar</button>
+        </form>
+    </div>
+
+
+
+
+<div id="tabela-livros">
+<h2>Livros cadastrados</h2>
+<table>
+<thead>
+<tr>
+<th>Título</th><th>Autor</th><th>Aluno</th><th>Curso</th><th>Matrícula</th><th>Ações</th>
+</tr>
+</thead>
+<tbody id="lista-livros"></tbody>
+</table>
+</div>
+
+
+
+
+
+    <script>
+        let livros = [];
+        const carregar = () => {
+            const livrosSalvos = localStorage.getItem('livros');
+            if (livrosSalvos) {livros = JSON.parse(livrosSalvos);
+            renderizar(); }
+        };
+
+        const salvar = () => {
+            localStorage.setItem('livros', JSON.stringify(livros));
+        };
+
+        const renderizar = () => {
+            const listaLivros = document.getElementById('lista-livros');
+            listaLivros.innerHTML = '';
+            livros.forEach(livro => {
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+        <td>${livro.titulo}</td> <td>${livro.autor}</td><td>${livro.aluno}</td><td>${livro.curso}</td><td>${livro.matricula}</td>
+        <td>
+        <button onclick="editar(${livro.id})">Editar</button>
+        <button onclick="excluir(${livro.id})">Excluir</button>
+        </td>
+         `;
+
+        
+    listaLivros.appendChild(linha);
+            });
+        };
+
+
+
+        const adicionar = (titulo, autor, aluno, curso, matricula) => {
+       const id = livros.length > 0 ? livros[livros.length - 1].id + 1 : 1;
+       livros.push({ id, titulo: titulo.toLowerCase(), autor: autor.toLowerCase(), aluno: aluno.toLowerCase(), curso: curso.toLowerCase(), matricula: matricula.toLowerCase() });
+    renderizar();
+   salvar();
+        };
+
+
+
+const editar = (id) => {
+            const livro = livros.find(livro => livro.id === id);
+    if (livro) {
+   document.getElementById('livro-id').value = livro.id;
+            document.getElementById('titulo').value = livro.titulo;
+      document.getElementById('autor').value = livro.autor;
+document.getElementById('aluno').value = livro.aluno;
+    document.getElementById('curso').value = livro.curso;
+    document.getElementById('matricula').value = livro.matricula;
+            }
+        };
+
+
+
+        const atualizar = (id, titulo, autor, aluno, curso, matricula) => {
+            const index = livros.findIndex(livro => livro.id === id);
+            if (index !== -1) {
+                livros[index] = { id, titulo: titulo.toLowerCase(), autor: autor.toLowerCase(), aluno: aluno.toLowerCase(), curso: curso.toLowerCase(), matricula: matricula.toLowerCase() };
+                renderizar();
+                salvar();
+             document.getElementById('livro-id').value = '';
+ document.getElementById('titulo').value = '';
+              document.getElementById('autor').value = '';
+                document.getElementById('aluno').value = '';
+         document.getElementById('curso').value = '';
+    document.getElementById('matricula').value = '';
+            }
+        };
+
+        const excluir = (id) => {
+            livros = livros.filter(livro => livro.id !== id);
+            renderizar();
+            salvar();
+        };
+
+        const formulario = document.getElementById('formulario-livro');
+        formulario.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+    const id = document.getElementById('livro-id').value;
+           const titulo = document.getElementById('titulo').value.toLowerCase();
+      const autor = document.getElementById('autor').value.toLowerCase();
+            const aluno = document.getElementById('aluno').value.toLowerCase();
+    const curso = document.getElementById('curso').value.toLowerCase();
+            const matricula = document.getElementById('matricula').value.toLowerCase();
+ if (id) {
+                atualizar(parseInt(id), titulo, autor, aluno, curso, matricula);
+            } else { adicionar(titulo, autor, aluno, curso, matricula);
+            }
+            formulario.reset();          });
+
+carregar();
+</script>
+</body>
+</html>
